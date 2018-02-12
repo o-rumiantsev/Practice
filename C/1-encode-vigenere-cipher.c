@@ -2,56 +2,56 @@
 #include <string.h>
 #include <stdlib.h>
 
-int getCol(int, char *, char);
-int getRow(int, char **, char);
+int get_row(int, char **, char);
+int get_col(int, char **, char);
 void offset(int, char *);
-char *decode(char *, char*);
-char *genKey(char *, char *);
-char **genMatrix(char *);
+char *encode(char *, char*);
+char *gen_key(char *, char *);
+char **gen_matrix(char *);
 
 int main() {
   int i = 0;
   int c;
-  char encoded[256];
+  char message[256];
   char secret[256];
 
-  printf("Enter encoded message: ");
-  fgets(encoded, 256, stdin);
+  printf("Enter message: ");
+  fgets(message, 256, stdin);
   printf("Enter secret word: ");
   fgets(secret, 256, stdin);
 
-  char *decoded = decode(secret, encoded);
-  printf("Encoded message: %s \n", decoded);
+  char *encoded = encode(secret, message);
+  printf("Encoded message: %s \n", encoded);
 
-  free(decoded);
+  free(encoded);
   return 0;
 };
 
 
-char *decode(char *secret, char *encoded) {
+char *encode(char *secret, char *message) {
   char alphabet[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ";
-  char **matrix = genMatrix(alphabet);
-  char *key = genKey(secret, encoded);
+  char **matrix = gen_matrix(alphabet);
+  char *key = gen_key(secret, message);
 
   int size = strlen(key);
-  char *decoded = (char*)malloc(sizeof(char) * size);
+  char *encoded = (char*)malloc(sizeof(char) * size);
 
   int msize = strlen(alphabet);
 
   for (int i = 0; i < size; ++i) {
-    int row = getRow(msize, matrix, key[i]);
-    int col = getCol(msize, matrix[row], encoded[i]);
-    decoded[i] = matrix[0][col];
+    int row = get_row(msize, matrix, key[i]);
+    int col = get_col(msize, matrix, message[i]);
+    encoded[i] = matrix[row][col];
   };
 
   free(matrix);
   free(key);
 
-  return decoded;
+  return encoded;
 };
 
 
-char **genMatrix(char *alphabet) {
+char **gen_matrix(char *alphabet) {
   int length = strlen(alphabet);
 
   char **matrix = (char **)malloc(sizeof(char*) * length);
@@ -74,9 +74,10 @@ void offset(int length, char *alphabet) {
   };
 };
 
-char *genKey(char *secret, char *encoded) {
+
+char *gen_key(char *secret, char *message) {
   int k = 0;
-  int size = strlen(encoded);
+  int size = strlen(message);
   char *key = (char*)malloc(sizeof(char) * size);
 
   for (int i = 0; i < size; ++i) {
@@ -90,7 +91,9 @@ char *genKey(char *secret, char *encoded) {
   return key;
 };
 
-int getRow(int size, char **matrix, char cryptoLetter) {
+
+
+int get_row(int size, char **matrix, char cryptoLetter) {
   for (int i = 0; i < size; ++i) {
     if (matrix[i][0] == cryptoLetter) {
       return i;
@@ -99,8 +102,8 @@ int getRow(int size, char **matrix, char cryptoLetter) {
 };
 
 
-int getCol(int size, char *row, char letter) {
-  for (int i = 0; i < strlen(row); ++i) {
-    if (row[i] == letter) return i;
+int get_col(int size, char **matrix, char letter) {
+  for (int i = 0; i < strlen(matrix[0]); ++i) {
+    if (matrix[0][i] == letter) return i;
   };
 };
