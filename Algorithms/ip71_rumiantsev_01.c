@@ -3,40 +3,24 @@
 #include <string.h>
 
 int *read_file(char *);
-int *get_even_only(int *, int);
-int *get_odd_only(int *, int);
-void sort_even(int *);
-void sort_odd(int *);
+void sort(int *);
 void write_file(int *);
 
-int g_even_length = 0;
-int g_odd_length = 0;
 int g_instance_length = 0;
 
 int main() {
-  char input[256];
-  fgets(input, 256, stdin);
+  char input[80];
+  printf("Enter input file name: ");
+  fgets(input, 80, stdin);
   input[strlen(input) - 1] = '\0';
 
   int *instance = read_file(input);
-
-  int *even = get_even_only(instance, g_instance_length);
-  int *odd = get_odd_only(instance, g_instance_length);
+  sort(instance);
+  write_file(instance);
 
   free(instance);
-
-  int *sorted = (int *)malloc(sizeof(int) * g_instance_length);
-  int index = 0;
-
-  for (int i = 0; i < g_even_length; ++i) sorted[index++] = even[i];
-  for (int i = 0; i < g_odd_length; ++i) sorted[index++] = odd[i];
-
-  write_file(sorted);
-
-  free(sorted);
   return 0;
 };
-
 
 // File I/O
 //
@@ -77,6 +61,7 @@ int *read_file(char *input_path) {
       i = 0;
     }
   } while (c != EOF);
+  
   fclose(input);
   return instance;
 };
@@ -84,8 +69,7 @@ int *read_file(char *input_path) {
 
 void write_file(int *instance) {
   FILE *output;
-  char output_path[80];
-  sprintf(output_path, "output_%d.txt", g_instance_length);
+  char output_path[] = "ip71_rumiantsev_output.txt";
 
   output = fopen(output_path, "w");
 
@@ -95,38 +79,8 @@ void write_file(int *instance) {
   }
 
   fclose(output);
+  printf("Sorted sucsessfully\n");
 };
-
-
-// Get even and odd numbers
-// from instance
-//
-int *get_even_only(int *arr, int length) {
-  int *even = (int*)malloc(sizeof(int) * length);
-  int index = 0;
-
-  for (int i = 0; i < length; ++i) {
-    if (arr[i] % 2 == 0) even[index++] = arr[i];
-  };
-
-  g_even_length = index;
-  sort_even(even);
-  return even;
-};
-
-int *get_odd_only(int *arr, int length) {
-  int *odd = (int *)malloc(sizeof(int) * length);
-  int index = 0;
-
-  for (int i = 0; i < length; ++i) {
-    if (arr[i] % 2 == 1) odd[index++] = arr[i];
-  };
-
-  g_odd_length = index;
-  sort_odd(odd);
-  return odd;
-};
-
 
 // Sort
 //
@@ -137,20 +91,22 @@ void swap(int *arr, int i, int j) {
   arr[j] = k;
 };
 
-void sort_even(int *even) {
-  for (int i = 1; i < g_even_length; ++i) {
-    for (int j = i; j > 0; --j) {
-      if (even[j] < even[j - 1]) swap(even, j, j - 1);
-      else break;
-    }
-  }
-};
-
-void sort_odd(int *odd) {
-  for (int i = 1; i < g_odd_length; ++i) {
-    for (int j = i; j > 0; --j) {
-      if (odd[j] > odd[j - 1]) swap(odd, j, j - 1);
-      else break;
+void sort(int *instance) {
+  for (int i = 0; i < g_instance_length; ++i) {
+    if (instance[i] % 2 == 1) {
+      for (int j = i; j > 0; --j) {
+        if (
+          instance[j - 1] % 2 == 0 || instance[j] < instance[j - 1]
+        ) break;
+        else swap(instance, j, j - 1);
+      }
+    } else {
+      for (int j = i; j > 0; --j) {
+        if (
+          instance[j - 1] % 2 == 1 || instance[j] < instance[j - 1]
+        ) swap(instance, j, j - 1);
+        else break;
+      }
     }
   }
 };
