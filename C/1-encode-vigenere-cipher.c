@@ -10,8 +10,6 @@ char *gen_key(char *, char *);
 char **gen_matrix(char *);
 
 int main() {
-  int i = 0;
-  int c;
   char message[256];
   char secret[256];
 
@@ -81,7 +79,8 @@ char *gen_key(char *secret, char *message) {
   char *key = (char*)malloc(sizeof(char) * size);
 
   for (int i = 0; i < size; ++i) {
-    if (k >= strlen(secret) - 1) {
+    int length = strlen(secret) - 1;
+    if (k >= length) {
       k = 0;
     }
     key[i] = secret[k++];
@@ -94,16 +93,21 @@ char *gen_key(char *secret, char *message) {
 
 
 int get_row(int size, char **matrix, char cryptoLetter) {
+  int index;
   for (int i = 0; i < size; ++i) {
     if (matrix[i][0] == cryptoLetter) {
-      return i;
+      index = i;
     }
   };
+  return index;
 };
 
 
 int get_col(int size, char **matrix, char letter) {
-  for (int i = 0; i < strlen(matrix[0]); ++i) {
-    if (matrix[0][i] == letter) return i;
+  int index;
+  int length = strlen(matrix[0]);
+  for (int i = 0; i < length; ++i) {
+    if (matrix[0][i] == letter) index = i;
   };
+  return index;
 };
