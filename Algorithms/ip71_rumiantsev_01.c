@@ -61,7 +61,7 @@ int *read_file(char *input_path) {
       i = 0;
     }
   } while (c != EOF);
-  
+
   fclose(input);
   return instance;
 };
@@ -92,7 +92,7 @@ void swap(int *arr, int i, int j) {
 };
 
 void sort(int *instance) {
-  for (int i = 0; i < g_instance_length; ++i) {
+  for (int i = 1; i < g_instance_length; ++i) {
     if (instance[i] % 2 == 1) {
       for (int j = i; j > 0; --j) {
         if (
