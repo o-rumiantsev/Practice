@@ -65,14 +65,23 @@ list *from_array(int *arr, int len) {
   return l;
 };
 
+// Get list node by index
+//
+//
+node *_get_by_index(list *l, int index) {
+  node *tmp = l->root;
+  while (tmp->index != index) tmp = tmp->next;
+  return tmp;
+};
+
+
 // Insert into list after
 // element with appropriate
 // index
 //
 void insert(list *ls, int index, int data) {
   node *tmp, *p,
-         *nd = ls->root;
-  while (nd->index != index) nd = nd->next;
+       *nd = _get_by_index(ls, index);
   p = nd->next;
   tmp = (node*)malloc(sizeof(node));
   nd->next = tmp;
@@ -99,6 +108,56 @@ void node_remove(list *ls, int index) {
   --ls->len;
 }
 
+// Free all nodes from list
+//
+//
+void list_clear(list *ls) {
+  node *tmp = ls->root;
+  node *next = tmp->next;
+  while (next) {
+    free(tmp);
+    tmp = next;
+    next = next->next;
+  }
+  ls->len = 0;
+}
+
+//
+//
+//
+void swap(list *ls, int index1, int index2) {
+  node *root = ls->root;
+  node *nd1 = _get_by_index(ls, index1);
+  node *nd2 = _get_by_index(ls, index2);
+  node *prev1, *prev2, *next1, *next2;
+  prev1 = root;
+  prev2 = root;
+  next1 = nd1->next;
+  next2 = nd2->next;
+  if (prev1 == nd1) prev1 = NULL;
+  else while (prev1->next != nd1) prev1 = prev1->next;
+  if (prev2 == nd2) prev2 = NULL;
+  else while (prev2->next != nd2) prev2 = prev2->next;
+  if (nd2 == next1) {
+    nd2->next = nd1;
+    nd1->next = next2;
+    if (nd1 != root) prev1->next = nd2;
+  } else if (nd1 == next2) {
+    nd1->next = nd2;
+    nd2->next = next1;
+    if (nd2 != root) prev2->next = nd1;
+  } else {
+    if (nd1 != root) prev1->next = nd2;
+    nd2->next = next1;
+    if (nd2 != root) prev2->next = nd1;
+    nd1->next = next2;
+  }
+  nd2->index = index1;
+  nd1->index = index2;
+  if (nd1 == root) ls->root = nd2;
+  if (nd2 == root) ls->root = nd1;
+}
+
 // Print list to console
 //
 //
@@ -110,6 +169,7 @@ void print_list(list *ls) {
     else printf("%d>\n", p->data);
     p = p->next;
   }
+  if (ls->len == 0) printf("empty>\n");
 }
 
 // Get list length

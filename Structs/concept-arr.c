@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "arraylike.h"
 
-
 int main() {
   list *l = init(10);
   push(l, 20);
@@ -26,8 +25,17 @@ int main() {
   int len2 = list_len(ls);
 
   printf(
-    "\nlist_len(l) = %d\nlist_len(ls) = %d\n",
+    "\nlist_len(l) = %d\nlist_len(ls) = %d\n\n",
     len1,
     len2
   );
+
+  insert(ls, 5, 12);
+  print_list(ls);
+
+  swap(l, 0, 10);
+  print_list(l);
+
+  list_clear(ls);
+  print_list(ls);
 }
