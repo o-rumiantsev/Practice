@@ -17,8 +17,17 @@ int main() {
   push(l, 120);
   print_list(l);
 
-  int a[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  int a[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
   int len = sizeof(a) / sizeof(int);
   list *ls = from_array(a, len);
   print_list(ls);
+
+  int len1 = list_len(l);
+  int len2 = list_len(ls);
+
+  printf(
+    "\nlist_len(l) = %d\nlist_len(ls) = %d\n",
+    len1,
+    len2
+  );
 }

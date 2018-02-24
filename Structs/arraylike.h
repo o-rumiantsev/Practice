@@ -10,5 +10,6 @@ list *from_array(int *, int);
 void insert(list *, int, int);
 void node_remove(list *, int);
 void print_list(list *);
+int list_len(list *);
 
 #endif

@@ -111,3 +111,10 @@ void print_list(list *ls) {
     p = p->next;
   }
 }
+
+// Get list length
+//
+//
+int list_len(list *l) {
+  return l->len;
+}
