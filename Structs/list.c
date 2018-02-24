@@ -2,51 +2,67 @@
 #include <stdlib.h>
 
 
+// ----- One-linked list -----
+
 struct node {
   int data;
   struct node *next;
 };
 
-
-struct node *init(int a) {
-  struct node *ls;
-  ls = (struct node*)malloc(sizeof(struct node));
-  ls->data = a;
-  ls->next = NULL;
-  return (ls);
+// Initialize list root
+//
+//
+struct node *init_oll(int data) {
+  struct node *nd;
+  nd = (struct node*)malloc(sizeof(struct node));
+  nd->data = data;
+  nd->next = NULL;
+  return nd;
 }
 
-
-struct node *add_node(struct node *ls, int data) {
+// Add new node to list
+//
+//
+struct node *add_node_oll(struct node *nd, int data) {
   struct node *tmp, *p;
   tmp = (struct node*)malloc(sizeof(struct node));
-  p = ls->next;
-  ls->next = tmp;
+  p = nd->next;
+  nd->next = tmp;
   tmp->data = data;
   tmp->next = p;
   return tmp;
 }
 
-
-struct node *remove_node(struct node *ls, struct node *root) {
+// Remove node from list
+//
+//
+struct node *remove_node_oll(struct node *nd, struct node *root) {
   struct node *tmp;
   tmp = root;
-  while (tmp->next != ls) tmp = tmp->next;
-  tmp->next = (ls->next) ? ls->next : NULL;
-  free(ls);
+  while (tmp->next != nd) tmp = tmp->next;
+  tmp->next = (nd->next) ? nd->next : NULL;
+  free(nd);
   return tmp;
 }
 
-
-struct node *root_remove(struct node *root) {
+// Rmove list root
+//
+//
+struct node *root_remove_oll(struct node *root) {
   struct node *tmp;
   tmp = root->next;
   free(root);
   return tmp;
 }
 
-
-struct node *swap(struct node *nd1, struct node *nd2, struct node *root) {
+// Swap two nodes
+//
+//
+struct node *swap_oll(
+  struct node *nd1,
+  struct node *nd2,
+  struct node *root
+) {
   struct node *prev1, *prev2, *next1, *next2;
   prev1 = root;
   prev2 = root;
@@ -75,21 +91,25 @@ struct node *swap(struct node *nd1, struct node *nd2, struct node *root) {
   return root;
 }
 
-
-struct node *copy(struct node *root) {
+// Copy list
+//
+//
+struct node *copy_oll(struct node *root) {
   struct node *tmp = root;
-  struct node *new_root = init(tmp->data);
+  struct node *new_root = init_oll(tmp->data);
   struct node *new_tmp = new_root;
   while (tmp->next) {
-    add_node(new_tmp, tmp->next->data);
+    add_node_oll(new_tmp, tmp->next->data);
     new_tmp = new_tmp->next;
     tmp = tmp->next;
   }
   return new_root;
 }
 
-
-void print_list(struct node *root) {
+// Print list nodes to console
+//
+//
+void print_oll(struct node *root) {
   struct node *p = root;
   do {
     printf("%d ", p->data);
@@ -99,25 +119,142 @@ void print_list(struct node *root) {
 }
 
 
-int main() {
-  struct node *a = init(10);
-  struct node *b = add_node(a, 20);
-  struct node *c = add_node(b, 30);
-  struct node *d = add_node(c, 40);
-  struct node *e = add_node(d, 50);
-  print_list(a);
+// ----- Two-linked list -----
 
-  struct node *new_root = copy(a);
-  print_list(new_root);
+struct node_tll {
+  int data;
+  struct node_tll *prev;
+  struct node_tll *next;
+};
 
-  struct node *f = swap(a, e, a);
-  print_list(f);
-
-  remove_node(b, f);
-  print_list(f);
-
-  struct node *g = root_remove(f);
-  print_list(g);
-
-  print_list(new_root);
+// Initialize list root
+//
+//
+struct node_tll *init_tll(int data) {
+  struct node_tll *nd;
+  nd = (struct node_tll *)malloc(sizeof(struct node_tll));
+  nd->data = data;
+  nd->next = NULL;
+  nd->prev = NULL;
+  return nd;
 }
+
+// Add node to list
+//
+//
+struct node_tll *add_node_tll(struct node_tll *nd, int data) {
+  struct node_tll *tmp, *p;
+  tmp = (struct node_tll *)malloc(sizeof(struct node_tll));
+  p = nd->next;
+  nd->next = tmp;
+  tmp->data = data;
+  tmp->next = p;
+  tmp->prev = nd;
+  if (p != NULL) p->prev = tmp;
+  return tmp;
+}
+
+// Remove node from list
+//
+//
+struct node_tll *remove_node_tll(struct node_tll *nd) {
+  struct node_tll *prev = nd->prev,
+                  *next = nd->next;
+  if (prev != NULL) prev->next = next;
+  if (next != NULL) next->prev = prev;
+  free(nd);
+  return prev;
+}
+
+// Remove root from list
+//
+//
+struct node_tll *root_remove_tll(struct node_tll *root) {
+  struct node_tll *tmp;
+  tmp = root->next;
+  tmp->prev = NULL;
+  free(root);
+  return tmp;
+}
+
+// Swap two nodes
+//
+//
+struct node_tll *swap_tll(
+  struct node_tll *nd1,
+  struct node_tll *nd2,
+  struct node_tll *root
+) {
+  struct node_tll *prev1, *prev2, *next1, *next2;
+  prev1 = nd1->prev;
+  prev2 = nd2->prev;
+  next1 = nd1->next;
+  next2 = nd2->next;
+  if (nd2 == next1) {
+    nd2->next = nd1;
+    nd2->prev = prev1;
+    nd1->next = next2;
+    nd1->prev = nd2;
+    if (next2 != NULL) next2->prev = nd1;
+    if (prev1 != root) prev1->next = nd2;
+  } else if (nd1 == next2) {
+    nd1->next = nd2;
+    nd1->prev = prev2;
+    nd2->next = next1;
+    nd2->prev = nd1;
+    if (next1 != NULL) next1->prev = nd2;
+    if (prev2 != root) prev2->next = nd1;
+  } else {
+    if (nd1 != root) prev1->next = nd2;
+    nd2->next = next1;
+    if (nd2 != root) prev2->next = nd1;
+    nd1->next = next2;
+    nd2->prev = prev1;
+    if (next2 != NULL) next2->prev = nd1;
+    nd1->prev = prev2;
+    if (next1 != NULL) next1->prev = nd2;
+  }
+  if (nd1 == root) return nd2;
+  if (nd2 == root) return nd1;
+  return root;
+}
+
+// Copy list
+//
+//
+struct node_tll *copy_tll(struct node_tll *root) {
+  struct node_tll *tmp = root;
+  struct node_tll *new_root = init_tll(tmp->data);
+  struct node_tll *new_tmp = new_root;
+  while (tmp->next) {
+    add_node_tll(new_tmp, tmp->next->data);
+    new_tmp = new_tmp->next;
+    tmp = tmp->next;
+  }
+  return new_root;
+}
+
+// Print list nodes to console
+//
+//
+void print_tll(struct node_tll *root) {
+  struct node_tll *p = root;
+  do {
+    printf("%d ", p->data);
+    p = p->next;
+  } while (p != NULL);
+  printf("\n");
+};
+
+// Print list nodes reverse to console
+//
+//
+void print_tll_reverse(struct node_tll *root) {
+  struct node_tll *p = root;
+  while (p->next != NULL) p = p->next;
+  do {
+    printf("%d ", p->data);
+    p = p->prev;
+  } while (p != NULL);
+  printf("\n");
+};
