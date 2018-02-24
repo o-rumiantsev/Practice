@@ -28,6 +28,9 @@ void _dec_after(node *nd) {
   }
 }
 
+// Initialize list root
+//
+//
 list *init(int data) {
   list *ls = (list*)malloc(sizeof(list));
   node *nd;
@@ -40,6 +43,9 @@ list *init(int data) {
   return ls;
 }
 
+// Push to the end of the list
+//
+//
 void push(list *ls, int data) {
   node *new_node = (node *)malloc(sizeof(node));
   node *tmp = ls->root;
@@ -50,6 +56,19 @@ void push(list *ls, int data) {
   ++ls->len;
 }
 
+// Make list from array
+//
+//
+list *from_array(int *arr, int len) {
+  list *l = init(arr[0]);
+  for (int i = 1; i < len; ++i) push(l, arr[i]);
+  return l;
+};
+
+// Insert into list after
+// element with appropriate
+// index
+//
 void insert(list *ls, int index, int data) {
   node *tmp, *p,
          *nd = ls->root;
@@ -64,6 +83,9 @@ void insert(list *ls, int index, int data) {
   ++ls->len;
 }
 
+// Remove node with
+// appropriate index
+//
 void node_remove(list *ls, int index) {
   node *nd = ls->root,
               *tmp, *p;
@@ -77,12 +99,15 @@ void node_remove(list *ls, int index) {
   --ls->len;
 }
 
+// Print list to console
+//
+//
 void print_list(list *ls) {
   node *p = ls->root;
-  printf("[");
+  printf("List <");
   for (int i = 0; i < ls->len; ++i) {
     if (p->next) printf("%d, ", p->data);
-    else printf("%d]\n", p->data);
+    else printf("%d>\n", p->data);
     p = p->next;
   }
 }
