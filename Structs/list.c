@@ -76,6 +76,19 @@ struct node *swap(struct node *nd1, struct node *nd2, struct node *root) {
 }
 
 
+struct node *copy(struct node *root) {
+  struct node *tmp = root;
+  struct node *new_root = init(tmp->data);
+  struct node *new_tmp = new_root;
+  while (tmp->next) {
+    add_node(new_tmp, tmp->next->data);
+    new_tmp = new_tmp->next;
+    tmp = tmp->next;
+  }
+  return new_root;
+}
+
+
 void print_list(struct node *root) {
   struct node *p = root;
   do {
@@ -94,6 +107,9 @@ int main() {
   struct node *e = add_node(d, 50);
   print_list(a);
 
+  struct node *new_root = copy(a);
+  print_list(new_root);
+
   struct node *f = swap(a, e, a);
   print_list(f);
 
@@ -102,4 +118,6 @@ int main() {
 
   struct node *g = root_remove(f);
   print_list(g);
+
+  print_list(new_root);
 }
