@@ -1,29 +1,41 @@
 #include <stdio.h>
+#include <math.h>
 #include <string.h>
 #include <stdlib.h>
 #define INT_MAX 2147483647
 
+int g_user;
 int g_film_count;
 int g_ucount;
 
 int **read_from_file(char *);
 int *get_arr(int *, int *);
 int count_inversions(int *, int, int);
-
-
+char **strsplit(char *, const char *);
+void sort_and_writefile(int **);
 
 int main(int argc, char **argv) {
   int **source = read_from_file(argv[1]);
-  int user = atoi(argv[2]);
+  g_user = atoi(argv[2]);
+  int **result = (int **)calloc(g_ucount, sizeof(int *));
 
-
+  int k = 0;
   for (int i = 1; i <= g_ucount; ++i) {
-    if (i != user) {
-      int *arr = get_arr(source[user], source[i]);
+    if (i != g_user) {
+      int *arr = get_arr(source[g_user], source[i]);
       int invs = count_inversions(arr, 0, g_film_count - 1);
-      printf("%d %d\n", i, invs);
+      result[k] = (int *)calloc(2, sizeof(int));
+      result[k][0] = i;
+      result[k][1] = invs;
+      ++k;
     }
   }
+
+  //
+  // for (int i = 0; i < g_ucount - 1; ++i) printf("%d ", result[i][1]);
+  // printf("\n");
+
+  sort_and_writefile(result);
 
   return 0;
 }
@@ -93,8 +105,67 @@ int **read_from_file(char *src_file) {
 
   free(split);
   free(str);
+  fclose(input);
 
   return source;
+}
+
+
+// Merge
+//
+//
+void merge(int **arr, int p, int q, int r) {
+  int n1 = q - p + 1;
+  int n2 = r - q;
+
+  int **L = (int **)calloc(n1, sizeof(int *));
+  int **R = (int **)calloc(n2, sizeof(int *));
+
+  for (int i = 0; i < n1; ++i) L[i] = arr[p + i];
+  for (int i = 0; i < n2; ++i) R[i] = arr[q + i + 1];
+
+  L[n1] = (int *)calloc(2, sizeof(int));
+  R[n2] = (int *)calloc(2, sizeof(int));
+
+  L[n1][1] = INT_MAX;
+  R[n2][1] = INT_MAX;
+
+  int i = 0;
+  int j = 0;
+  for (int k = p; k <= r; ++k) {
+    if (L[i][1] <= R[j][1]) {
+      arr[k] = L[i++];
+    } else arr[k] = R[j++];
+  }
+}
+
+
+// Merge sort result
+//
+//
+void merge_sort(int **arr, int p, int r) {
+  if (p < r) {
+    int q = floor((p + r) / 2);
+    merge_sort(arr, p, q);
+    merge_sort(arr, q + 1, r);
+    merge(arr, p, q, r);
+  }
+}
+
+// Sort result and write it to file
+//
+//
+void sort_and_writefile(int **result) {
+  merge_sort(result, 0, g_ucount - 2);
+
+  FILE *output = fopen("ip71_rumiantsev_02_output.txt", "a");
+
+  fprintf(output, "%d\n", g_user);
+
+  for (int i = 0; i < g_ucount - 1; ++i)
+    fprintf(output, "%d %d\n", result[i][0], result[i][1]);
+
+  fclose(output);
 }
 
 
