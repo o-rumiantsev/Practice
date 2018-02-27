@@ -31,10 +31,6 @@ int main(int argc, char **argv) {
     }
   }
 
-  //
-  // for (int i = 0; i < g_ucount - 1; ++i) printf("%d ", result[i][1]);
-  // printf("\n");
-
   sort_and_writefile(result);
 
   return 0;
@@ -162,8 +158,9 @@ void sort_and_writefile(int **result) {
 
   fprintf(output, "%d\n", g_user);
 
-  for (int i = 0; i < g_ucount - 1; ++i)
+  for (int i = 0; i < g_ucount - 1; ++i) {
     fprintf(output, "%d %d\n", result[i][0], result[i][1]);
+  }
 
   fclose(output);
 }

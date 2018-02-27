@@ -30,7 +30,7 @@ int count_unpaired(const char *source) {
 
 char *optimize(const char *source) {
   int source_length = strlen(source);
-  char *optimized = (char *)malloc(source_length * sizeof(char *));
+  char *optimized = (char *)calloc(source_length, sizeof(char *));
   strcpy(optimized, source);
 
   int optimization_index = 0;
@@ -71,14 +71,15 @@ char *optimize(const char *source) {
       for (int i = source_length; i > 0; --i) {
         if (optimized[i] == ' ') move_to_end(optimized, i);
       }
+      printf("%s\n", optimized);
     }
   }
 
-
+  printf("%d\n", optimization_index);
   if (optimization_index) {
     int source_optimized_length = source_length - optimization_index;
-    char *source_optimized = (char *)malloc(
-      source_optimized_length * sizeof(char)
+    char *source_optimized = (char *)calloc(
+      source_optimized_length, sizeof(char)
     );
     strncpy(source_optimized, optimized, source_optimized_length);
     free(optimized);
@@ -111,7 +112,8 @@ const char *brainfuck_to_c(const char *source_not_optimized) {
   int count = 0;
   int tabs = 0;
 
-  char *result = (char *)malloc(80 * operators * sizeof(char));
+  char *result = (char *)calloc(80 * operators, sizeof(char));
+  char *ident = (char *)calloc(tabs, sizeof(char));
   while (o != operators && i < source_length) {
     if (source[i] == '+' ||
         source[i] == '-' ||
@@ -122,38 +124,37 @@ const char *brainfuck_to_c(const char *source_not_optimized) {
     if (source[i] != source[i + 1]) {
       if (source[i] == ']') tabs -=2;
 
-      char *ident = (char *)malloc(tabs * sizeof(char));
       memset(ident, ' ', tabs);
       if (source[i] == '+') {
-        char *line = (char *)malloc(80 * sizeof(char));
+        char *line = (char *)calloc(80, sizeof(char));
         sprintf(line, "%s*p += %d;\n", ident, count);
         strcat(result, line);
         free(line);
         count = 0;
         ++o;
       } else if (source[i] == '-') {
-        char *line = (char *)malloc(80 * sizeof(char));
+        char *line = (char *)calloc(80, sizeof(char));
         sprintf(line, "%s*p -= %d;\n", ident, count);
         strcat(result, line);
         free(line);
         count = 0;
         ++o;
       } else if (source[i] == '>') {
-        char *line = (char *)malloc(80 * sizeof(char));
+        char *line = (char *)calloc(80, sizeof(char));
         sprintf(line, "%sp += %d;\n", ident, count);
         strcat(result, line);
         free(line);
         count = 0;
         ++o;
       } else if (source[i] == '<') {
-        char *line = (char *)malloc(80 * sizeof(char));
+        char *line = (char *)calloc(80, sizeof(char));
         sprintf(line, "%sp -= %d;\n", ident, count);
         strcat(result, line);
         free(line);
         count = 0;
         ++o;
       } else if (source[i] == '[') {
-        char *line = (char *)malloc(80 * sizeof(char));
+        char *line = (char *)calloc(80, sizeof(char));
         sprintf(line, "%sif (*p) do {\n", ident);
         tabs += 2;
         strcat(result, line);
@@ -161,35 +162,34 @@ const char *brainfuck_to_c(const char *source_not_optimized) {
         count = 0;
         ++o;
       } else if (source[i] == ']') {
-        char *line = (char *)malloc(80 * sizeof(char));
+        char *line = (char *)calloc(80, sizeof(char));
         sprintf(line, "%s} while (*p);\n", ident);
         strcat(result, line);
         free(line);
         count = 0;
         ++o;
       } else if (source[i] == '.') {
-        char *line = (char *)malloc(80 * sizeof(char));
+        char *line = (char *)calloc(80, sizeof(char));
         sprintf(line, "%sputchar(*p);\n", ident);
         strcat(result, line);
         free(line);
         count = 0;
         ++o;
       } else if (source[i] == ',') {
-        char *line = (char *)malloc(80 * sizeof(char));
+        char *line = (char *)calloc(80, sizeof(char));
         sprintf(line, "%s*p = getchar();\n", ident);
         strcat(result, line);
         free(line);
         count = 0;
         ++o;
       }
-
-      free(ident);
-      printf("IDENT %s\n", ident);
+      memset(ident, '\0', tabs);
     }
     ++i;
   }
-  printf("%s\n", result);
+  free(ident);
   free(source);
+  printf("%s\n", result);
   return result;
 }
 
@@ -200,10 +200,11 @@ int main() {
   // brainfuck_to_c("<<<<");
   // brainfuck_to_c(".");
   // brainfuck_to_c(",");
-  brainfuck_to_c("[[[]]");
-  brainfuck_to_c("[][]");
-  brainfuck_to_c("[.]");
-  brainfuck_to_c(".,.<>>,+.[><>--]+,-[.<,[]>+.><>-]>>");
+  // brainfuck_to_c("[[[]]");
+  // brainfuck_to_c("[][]");
+  // brainfuck_to_c("[.]");
+  // brainfuck_to_c(".,.<>>,+.[><>--]+,-[.<,[]>+.><>-]>>");
+  brainfuck_to_c("<-.[,,+]---><[][-,>[[+[],>+>..,><+[<.,+<>..-+,[[+,.><>[><><<-.-,<->>>.++<-,.<][++--,<[-,],++[,->+[-]]]]]]]]]");
   // const char *expected = "putchar(*p);\n*p = getchar();\nputchar(*p);\np += 1;\n*p = getchar();\n*p += 1;\nputchar(*p);\nif (*p) do {\n  p += 1;\n  *p -= 2;\n} while (*p);\n*p += 1;\n*p = getchar();\n*p -= 1;\nif (*p) do {\n  putchar(*p);\n  p -= 1;\n  *p = getchar();\n  p += 1;\n  *p += 1;\n  putchar(*p);\n  p += 1;\n  *p -= 1;\n} while (*p);\np += 2;\n";
   // printf("Expected:\n%s\n", expected);
   // printf("Actual:\n%s\n", output);
