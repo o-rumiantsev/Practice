@@ -31,7 +31,7 @@ pub fn get(data: &Vec<Vec<i8>>) -> Vec<Point> {
         let len = v.len();
         for x in 0..len {
             let mut p = Point::new(x, y);
-            if data[y][x] != 0 {
+            if data[y][x] == 0 {
                 for i in 0..l {
                     if data[i][x] != 0 && i != y {
                         p.weight = p.weight + 1;
