@@ -80,3 +80,29 @@ pub fn sort(points: &mut Vec<Point>) {
         }
     }
 }
+
+pub fn validate(data: &Vec<Vec<i8>>, x: usize, y: usize, val: i8) -> bool {
+    let mut column = Vec::new();
+    let mut square = Vec::new();
+    let (x1, y1, x2, y2) = square_coords(x, y);
+
+    for row in data {
+        column.push(row[x]);
+    }
+
+    for i in y1..y2 {
+        for j in x1..x2 {
+            square.push(data[i][j]);
+        }
+    }
+
+    if
+        column.contains(&val) ||
+        data[y].contains(&val) ||
+        square.contains(&val)
+    {
+        return false;
+    }
+
+    true
+}
