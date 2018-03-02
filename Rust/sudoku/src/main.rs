@@ -15,4 +15,6 @@ fn main() {
     for p in &points {
         println!("{:?}", p);
     }
+
+    let result = sudoku::solve(&data, &mut points);
 }

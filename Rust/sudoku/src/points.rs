@@ -9,10 +9,11 @@ pub struct Point {
 impl Point {
     fn new(x: usize, y: usize) -> Point {
         Point {
-            x, y, vals: vec![], weight: 0
+            x, y, vals: Vec::new(), weight: 0
         }
     }
 }
+
 
 fn square_coords(x: usize, y: usize) -> (usize, usize, usize, usize) {
     let x1: usize = (x / 3) * 3;
@@ -22,23 +23,54 @@ fn square_coords(x: usize, y: usize) -> (usize, usize, usize, usize) {
     (x1, y1, x2, y2)
 }
 
-pub fn get(data: &Vec<Vec<i8>>) -> Vec<Point> {
-    let mut points: Vec<Point> = vec![];
-    let l = data.len();
+fn predict(data: &Vec<Vec<i8>>, point: &mut Point) {
+    let mut possible_values = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let x = point.x;
+    let y = point.y;
 
-    for y in 0..l {
-        let v = &data[y];
-        let len = v.len();
-        for x in 0..len {
+    for i in 0..9 {
+        if data[i][x] != 0 {
+
+        }
+    }
+
+    for j in 0..9 {
+        if data[y][j] != 0 {
+
+        }
+    }
+
+    let (x1, y1, x2, y2) = square_coords(x, y);
+    for i in y1..y2 {
+        for j in x1..x2 {
+            if
+                data[i][j] != 0 &&
+                i != y &&
+                j != x
+            {
+
+            }
+        }
+    }
+
+    println!("{:?}", possible_values);
+}
+
+
+pub fn get(data: &Vec<Vec<i8>>) -> Vec<Point> {
+    let mut points: Vec<Point> = Vec::new();
+
+    for y in 0..9 {
+        for x in 0..9 {
             let mut p = Point::new(x, y);
             if data[y][x] == 0 {
-                for i in 0..l {
+                for i in 0..9 {
                     if data[i][x] != 0 && i != y {
                         p.weight = p.weight + 1;
                     }
                 }
 
-                for j in 0..len {
+                for j in 0..9 {
                     if data[y][j] != 0 && j != x {
                         p.weight = p.weight + 1;
                     }
@@ -57,12 +89,13 @@ pub fn get(data: &Vec<Vec<i8>>) -> Vec<Point> {
                     }
                 }
 
+                predict(&data, &mut p);
                 points.push(p);
             }
         }
     };
 
-    return points;
+    points
 }
 
 
