@@ -1,15 +1,18 @@
 #[derive(Debug)]
 pub struct Point {
-    x: usize,
-    y: usize,
-    vals: Vec<i8>,
+    pub x: usize,
+    pub y: usize,
+    pub vals: Vec<i8>,
     weight: i8
 }
 
 impl Point {
     fn new(x: usize, y: usize) -> Point {
         Point {
-            x, y, vals: Vec::new(), weight: 0
+            x,
+            y,
+            vals: Vec::new(),
+            weight: 0
         }
     }
 }
