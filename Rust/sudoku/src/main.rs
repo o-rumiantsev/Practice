@@ -16,5 +16,5 @@ fn main() {
         println!("{:?}", p);
     }
 
-    let result = sudoku::solve(&data, &mut points);
+    // let result = sudoku::solve(&data, &mut points);
 }

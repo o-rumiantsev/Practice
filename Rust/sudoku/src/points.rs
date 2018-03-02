@@ -30,13 +30,21 @@ fn predict(data: &Vec<Vec<i8>>, point: &mut Point) {
 
     for i in 0..9 {
         if data[i][x] != 0 {
-
+            let pos = possible_values.iter()
+              .position(|val| *val == data[i][x]).unwrap_or(10);
+            if pos < possible_values.len() {
+                possible_values.remove(pos);
+            }
         }
     }
 
     for j in 0..9 {
         if data[y][j] != 0 {
-
+            let pos = possible_values.iter()
+              .position(|val| *val == data[y][j]).unwrap_or(10);
+            if pos < possible_values.len() {
+                possible_values.remove(pos);
+            }
         }
     }
 
@@ -48,12 +56,16 @@ fn predict(data: &Vec<Vec<i8>>, point: &mut Point) {
                 i != y &&
                 j != x
             {
-
+                let pos = possible_values.iter()
+                  .position(|val| *val == data[i][j]).unwrap_or(10);
+                if pos < possible_values.len() {
+                    possible_values.remove(pos);
+                }
             }
         }
     }
 
-    println!("{:?}", possible_values);
+    point.vals = possible_values;
 }
 
 
