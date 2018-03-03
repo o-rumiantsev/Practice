@@ -19,9 +19,8 @@ fn main() {
 
 
     if valid {
-        println!("\nValidation: Success!");
         input::output(&result);
     } else {
-        println!("\nValidation: Failed!");
+        eprintln!("Validation failed");
     }
 }

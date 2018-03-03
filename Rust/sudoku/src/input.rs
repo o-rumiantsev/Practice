@@ -1,4 +1,3 @@
-use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::env;
@@ -38,10 +37,5 @@ pub fn output(result: &Vec<Vec<i8>>) {
         result_string.push_str("\n");
     }
 
-    let exe_path = env::current_exe().unwrap();
-    let path = exe_path.parent().unwrap().join("files/output.txt");
-
-    fs::remove_file(&path);
-    let mut file = File::create(&path).expect("Can't create file");
-    file.write_fmt(format_args!("{}", result_string)).expect("Can't write_fmt");
+    println!("{}", result_string);
 }
