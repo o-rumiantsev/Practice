@@ -4,11 +4,9 @@ pub mod test;
 
 pub fn solve(data: &Vec<Vec<i8>>, points: &Vec<points::Point>, pn: usize) -> Vec<Vec<i8>> {
     let mut copy: Vec<Vec<i8>> = data.to_vec();
-
     if pn == points.len() {
         return copy;
     }
-
 
     let mut valid = false;
     for val in &points[pn].vals {
