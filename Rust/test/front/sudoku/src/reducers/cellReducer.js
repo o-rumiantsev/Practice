@@ -1,4 +1,4 @@
-import { CHANGE_CELL } from '../actions'
+import { CHANGE_CELL } from '../actions';
 
 const initialState = [];
 

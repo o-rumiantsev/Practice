@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import injectSheet from 'react-jss';
+import { connect } from 'react-redux';
 
+import { addValue, deleteValue } from '../actions';
 
 const styles = {
   cell: {
@@ -35,13 +37,18 @@ class Cell extends Component {
     this.state = { value: '' };
   }
 
+  focusInput = () => this.textInput.focus();
+
   componentWillReceiveProps = (nextProps) => {
     if (nextProps.active) this.focusInput();
   }
 
   handleChange = (event) => {
     const value = validateInput(event.target.value);
-    if (value) this.setState({ value });
+    if (value) {
+      this.setState({ value });
+      this.props.updateValue(this.props.cellid, value);
+    }
   }
 
   onKeyDown = (event) => {
@@ -51,7 +58,7 @@ class Cell extends Component {
       case 'ArrowLeft':
         if (ids[currId - 1]) this.props.moveCursor(ids[currId - 1]);
         break;
-      case 'ArrowRight':
+      case 'ArrowRight': case 'Enter':
         if (ids[currId + 1]) this.props.moveCursor(ids[currId + 1]);
         break;
       case 'ArrowUp':
@@ -60,10 +67,12 @@ class Cell extends Component {
       case 'ArrowDown':
         if (ids[currId + 9]) this.props.moveCursor(ids[currId + 9]);
         break;
+      case 'Backspace': case  'Delete':
+        this.setState({ value: '' });
+        deleteValue(this.cellid);
+        break;
     }
   }
-
-  focusInput = () => this.textInput.focus();
 
   render() {
     const { classes } = this.props;
@@ -76,4 +85,10 @@ class Cell extends Component {
   }
 }
 
-export default injectSheet(styles)(Cell);
+export default connect(
+  state => state,
+  (dispatch) => ({
+    updateValue: (id, value) => dispatch(addValue(id, value)),
+    deleteValue: (id) => dispatch(deleteValue(id))
+  })
+)(injectSheet(styles)(Cell));
