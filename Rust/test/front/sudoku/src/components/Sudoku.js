@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Table } from 'semantic-ui-react';
-import Cell from './Cell'
 import injectSheet from 'react-jss';
+
+import CellContainer from '../containers/CellContainer';
+
 
 const styles = {
   table: {
@@ -19,7 +21,7 @@ const intoCells = (row, classes) => {
   const cells = new Array(9).fill(0);
   return cells.map((cell, i) => (
     <Table.Cell key = {`${row}${i + 1}`} className = {classes.cells} >
-      <Cell id = {`${row}${i + 1}`}/>
+      <CellContainer cellid = {`${row}${i + 1}`}/>
     </Table.Cell>
   ));
 };

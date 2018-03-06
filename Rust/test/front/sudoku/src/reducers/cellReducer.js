@@ -1,4 +1,5 @@
 import { CHANGE_CELL } from '../actions'
+
 const initialState = [];
 
 ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
@@ -12,10 +13,10 @@ const initialState = [];
 const changeCell = (state = initialState, action) => {
   switch (action.type) {
     case CHANGE_CELL:
-      return state.map((cell) => (
-        (cell.id === action.id) || cell.active ?
-          { id: cell.id, active: !cell.active } : cell
-      ));
+      initialState.forEach(item => (item.active = false));
+      const newState = initialState.find(cell => (cell.id === action.id));
+      newState.active = !newState.active;
+      return newState;
     default:
       return state;
   }
