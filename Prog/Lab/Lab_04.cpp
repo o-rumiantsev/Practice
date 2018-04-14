@@ -1,8 +1,12 @@
 #include <iostream>
 #include <string>
+#include "structs.h"
 #define is_operator(c) (c == '+' || c == '-' || c == '/' || c == '*')
+#define has_first_priority(o) (o == "*" || o == "/")
+#define has_second_priority(o) (o == "+" || o == "-")
 
 using namespace std;
+
 
 string *split_by_operators(string line, int *split_length) {
   int operators = 0;
@@ -86,14 +90,77 @@ string *get_expression(int argc, char **argv, int *expr_length) {
   return expr;
 }
 
-int evaluate(string *expression, int length) {
-  cout << "[";
-  for (int i = 0; i < length; ++i) {
-    cout << expression[i] << " ";
-  }
-  cout << "]" << endl;
+int _eval(string op, int a, int b) {
+  if (op == "+") return a + b;
+  else if (op == "-") return a - b;
+  else if (op == "*") return a * b;
+  else return a / b;
+}
 
-  return length;
+int evaluate(string *expression, int length) {
+  deque expr;
+  deque params;
+  deque operators;
+
+  for (int i = 0; i < length; ++i) {
+    expr.push(expression[i]);
+  }
+
+  while (expr.length()) {
+    string cur = expr.shift();
+
+    if (has_first_priority(cur)) {
+      if (!operators.length()) {
+        operators.push(cur);
+        continue;
+      }
+
+      string prev_op = operators.pop();
+
+      if (params.length() >= 2 && has_first_priority(prev_op)) {
+        string par2 = params.pop();
+        string par1 = params.pop();
+        int res = _eval(prev_op, stoi(par1), stoi(par2));
+        params.push(to_string(res));
+        operators.push(cur);
+      } else {
+        operators.push(prev_op);
+        operators.push(cur);
+      }
+    } else if (has_second_priority(cur)) {
+      if (!operators.length()) {
+        operators.push(cur);
+        continue;
+      }
+
+      string prev_op = operators.pop();
+
+      if ((params.length() >= 2 && has_first_priority(prev_op)) ||
+        (params.length() >= 2 && has_second_priority(prev_op))) {
+        string par2 = params.pop();
+        string par1 = params.pop();
+        int res = _eval(prev_op, stoi(par1), stoi(par2));
+        params.push(to_string(res));
+        operators.push(cur);
+      } else {
+        operators.push(prev_op);
+        operators.push(cur);
+      }
+    } else {
+      params.push(cur);
+    }
+  }
+
+  while (operators.length() != 0) {
+    string op = operators.pop();
+    string par2 = params.pop();
+    string par1 = params.pop();
+    int res = _eval(op, stoi(par1), stoi(par2));
+    params.push(to_string(res));
+  }
+
+  int result = stoi(params.pop());
+  return result;
 }
 
 int main(int argc, char **argv) {
@@ -106,5 +173,5 @@ int main(int argc, char **argv) {
   int expr_length;
   string *expression = get_expression(argc, argv, &expr_length);
   int result = evaluate(expression, expr_length);
-  // cout << result << endl;
+  cout << result << endl;
 }
