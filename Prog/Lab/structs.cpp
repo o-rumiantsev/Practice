@@ -22,7 +22,7 @@ void stack::push(string data) {
   temp->data = data;
   temp->next = NULL;
 
-  if (head == NULL) {
+  if (!head) {
     head = temp;
     tail = temp;
   } else {
@@ -38,7 +38,7 @@ void stack::unshift(string data) {
   temp->data = data;
   temp->next = NULL;
 
-  if (head == NULL) {
+  if (!head) {
     head = temp;
     tail = head;
   } else {
@@ -83,7 +83,7 @@ void stack::remove(string data) {
     head = to_remove->next;
     delete to_remove;
     return;
-  } else if (temp->next->next == NULL && tail->data == data) {
+  } else if (!temp->next->next && tail->data == data) {
     temp->next = NULL;
     delete temp;
   }
@@ -103,7 +103,7 @@ void stack::remove(string data) {
 void stack::print() {
   stack_node *temp;
   temp = head;
-  if (temp == NULL) {
+  if (!temp) {
     cout << "e m p t y" << endl;
     return;
   }
@@ -172,7 +172,7 @@ void deque::push(string data) {
   temp->prev = NULL;
   temp->next = NULL;
 
-  if (head == NULL) {
+  if (!head) {
     head = temp;
     tail = head;
   } else {
@@ -190,7 +190,7 @@ void deque::unshift(string data) {
   temp->prev = NULL;
   temp->next = NULL;
 
-  if (head == NULL) {
+  if (!head) {
     head = temp;
     tail = head;
   } else {
@@ -270,7 +270,7 @@ void deque::remove(string data) {
 void deque::print() {
   deque_node *temp;
   temp = head;
-  if (temp == NULL) {
+  if (!temp) {
     cout << "e m p t y" << endl;
     return;
   }
