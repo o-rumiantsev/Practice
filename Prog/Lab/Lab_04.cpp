@@ -90,14 +90,14 @@ string *get_expression(int argc, char **argv, int *expr_length) {
   return expr;
 }
 
-int eval(string op, int a, int b) {
+auto eval(string op, auto a, auto b) {
   if (op == "+") return a + b;
   else if (op == "-") return a - b;
   else if (op == "*") return a * b;
   else return a / b;
 }
 
-int evaluate(string *expression, int length) {
+auto evaluate(string *expression, int length) {
   deque expr;
   deque params;
   deque operators;
@@ -120,7 +120,7 @@ int evaluate(string *expression, int length) {
       if (params.length() >= 2 && has_first_priority(prev_op)) {
         string par2 = params.pop();
         string par1 = params.pop();
-        int res = eval(prev_op, stoi(par1), stoi(par2));
+        auto res = eval(prev_op, float(stod(par1)), float(stod(par2)));
         params.push(to_string(res));
         operators.push(cur);
       } else {
@@ -139,7 +139,7 @@ int evaluate(string *expression, int length) {
         (params.length() >= 2 && has_second_priority(prev_op))) {
         string par2 = params.pop();
         string par1 = params.pop();
-        int res = eval(prev_op, stoi(par1), stoi(par2));
+        auto res = eval(prev_op, float(stod(par1)), float(stod(par2)));
         params.push(to_string(res));
         operators.push(cur);
       } else {
@@ -147,19 +147,36 @@ int evaluate(string *expression, int length) {
         operators.push(cur);
       }
     } else {
-      params.push(cur);
+      float number = float(stod(cur));
+      params.push(to_string(number));
+
+      if (expr.length() == 0) {
+        string op = operators.pop();
+
+        if (!has_first_priority(op)) {
+          operators.push(op);
+          continue;
+        }
+
+        string par2 = params.pop();
+        string par1 = params.pop();
+        auto res = eval(op, float(stod(par1)), float(stod(par2)));
+        params.push(to_string(res));
+        continue;
+      }
+
     }
   }
 
   while (operators.length() != 0) {
-    string op = operators.pop();
-    string par2 = params.pop();
-    string par1 = params.pop();
-    int res = eval(op, stoi(par1), stoi(par2));
-    params.push(to_string(res));
+    string op = operators.shift();
+    string par1 = params.shift();
+    string par2 = params.shift();
+    auto res = eval(op, float(stod(par1)), float(stod(par2)));
+    params.unshift(to_string(res));
   }
 
-  int result = stoi(params.pop());
+  auto result = float(stod(params.pop()));
   return result;
 }
 
@@ -172,6 +189,6 @@ int main(int argc, char **argv) {
 
   int expr_length;
   string *expression = get_expression(argc, argv, &expr_length);
-  int result = evaluate(expression, expr_length);
-  cout << result << endl;
+  auto result = evaluate(expression, expr_length);
+  cout << "Result: " << result << endl;
 }
