@@ -97,12 +97,6 @@ int evaluate(string *expression, int length) {
 }
 
 int main(int argc, char **argv) {
-  // string str ("+1");
-  // int len;
-  // string *split = split_by_operators(str, &len);
-  // for (int i = 0; i < len; ++i) cout << "|" << split[i] << "|";
-  // cout << endl;
-
   int expr_length;
   string *expression = get_expression(argc, argv, &expr_length);
   int result = evaluate(expression, expr_length);
