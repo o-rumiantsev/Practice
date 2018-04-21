@@ -12,6 +12,7 @@ int main(int argc, char **argv) {
   if (mode == compress_mode) {
     cout << "compressing..." << endl;
     char *output = argv[2];
+    remove(output);
     int i;
     for (i = 3; i < argc; ++i) {
       compress_file(argv[i], output);

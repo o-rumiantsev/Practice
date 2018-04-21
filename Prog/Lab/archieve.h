@@ -5,16 +5,19 @@
 #ifndef archieve_h
 #define archieve_h
 
-void lz78(
-  std::ifstream *,
-  std::ofstream *,
-  std::filebuf *
-);
-
 void rle(
   std::ifstream *,
   std::ofstream *,
-  std::filebuf *
+  std::filebuf *,
+  int *
+);
+
+void lz78(
+  std::ifstream *,
+  std::ofstream *,
+  std::filebuf *,
+  int *,
+  int *
 );
 
 
@@ -27,68 +30,44 @@ void compress_file(char *filename, char *output_filename) {
 
   std::filebuf *buf_temp = input.rdbuf();
 
-  rle(&input, &temp_out, buf_temp);
+  int input_size = 0;
+
+  rle(&input, &temp_out, buf_temp, &input_size);
 
   input.close();
   temp_out.close();
 
+
   std::ifstream temp_in ("temp.comp", std::ifstream::binary);
-  std::ofstream output (output_filename, std::ios::binary);
+  std::ofstream output (output_filename, std::ios::app);
   output << std::hex << std::uppercase;
 
   std::filebuf *buf = temp_in.rdbuf();
 
-  lz78(&temp_in, &output, buf);
+  int output_size = 0;
+
+  lz78(&temp_in, &output, buf, &input_size, &output_size);
+
+  int diff = input_size - output_size;
+  float coef = float(float(diff) / float(input_size));
+  std::cout << "Input: " << input_size << std::endl;
+  std::cout << "Output: " << output_size << std::endl;
+  std::cout << "Compression coeficient: " << coef << std::endl;
 
   temp_in.close();
+  remove("temp.comp");
   output.close();
-}
-
-
-void lz78(
-  std::ifstream *input,
-  std::ofstream *output,
-  std::filebuf *buf
-) {
-  int size = buf->pubseekoff(0, input->end, input->in);
-  int code = -1;
-  std::map<std::string, int> phrases;
-  std::string phrase;
-
-  for (int i = 0; i < size; ++i) {
-    buf->pubseekpos(i, input->in);
-    char byte = buf->sgetc();
-    phrase.push_back(byte);
-
-    std::map<std::string, int>::iterator iter = phrases.find(phrase);
-    if (iter == phrases.end()) {
-      std::string encoded;
-      std::string subphrase = phrase.substr(0, phrase.length() - 1);
-      std::map<std::string, int>::iterator it = phrases.find(subphrase);
-
-      if (it != phrases.end()) {
-        encoded.push_back(it->second);
-      }
-
-      encoded.push_back(byte);
-      std::cout << encoded << " ";
-
-      *output << encoded;
-      phrases.insert(std::pair<std::string, int>(phrase, code--));
-      phrase.clear();
-    }
-  }
-
-  std::cout << std::endl;
 }
 
 
 void rle(
   std::ifstream *input,
   std::ofstream *output,
-  std::filebuf *buf
+  std::filebuf *buf,
+  int *input_size
 ) {
   int size = buf->pubseekoff(0, input->end, input->in);
+  *input_size = size;
 
   int counter = 0;
   int previous_byte = -1;
@@ -114,6 +93,45 @@ void rle(
     }
 
     previous_byte = byte;
+  }
+}
+
+
+void lz78(
+  std::ifstream *input,
+  std::ofstream *output,
+  std::filebuf *buf,
+  int *input_size,
+  int *output_size
+) {
+  int size = buf->pubseekoff(0, input->end, input->in);
+  int code = -1;
+  std::map<std::string, int> phrases;
+  std::string phrase;
+
+  for (int i = 0; i < size; ++i) {
+    buf->pubseekpos(i, input->in);
+    char byte = buf->sgetc();
+    phrase.push_back(byte);
+
+    std::map<std::string, int>::iterator iter = phrases.find(phrase);
+    if (iter == phrases.end()) {
+      std::string encoded;
+      std::string subphrase = phrase.substr(0, phrase.length() - 1);
+      std::map<std::string, int>::iterator it = phrases.find(subphrase);
+
+      if (it != phrases.end()) {
+        encoded.push_back(it->second);
+      }
+
+      encoded.push_back(byte);
+
+      *output << encoded;
+      *output_size += encoded.length();
+
+      phrases.insert(std::pair<std::string, int>(phrase, code--));
+      phrase.clear();
+    }
   }
 }
 
