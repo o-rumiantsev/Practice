@@ -1,5 +1,5 @@
 #include <iostream>
-#include "archieve.h"
+#include "archive.h"
 #include <string>
 
 using namespace std;
