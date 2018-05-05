@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     cout << "decompressing..." << endl;
     decompress_file(argv[2]);
   } else {
-    cout << "Ivalid mode" << endl;
+    cout << "Invalid mode" << endl;
     cout << "--compress";
     cout << " to comress files" << endl;
     cout << "--decompress";
