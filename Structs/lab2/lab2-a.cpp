@@ -10,9 +10,9 @@ int main() {
   tree.generate(10, 1, 10);
   tree.print();
 
-  int count = 0;
-  vector<int> uniq = tree.uniq(&count);
+  vector<int> uniq = tree.uniq();
 
+  int count = uniq.size();
   for (int i = 0; i < count; ++i) cout << uniq[i] << " ";
   cout << endl;
 

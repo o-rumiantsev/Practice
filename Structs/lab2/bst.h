@@ -14,8 +14,9 @@ private:
   void _remove(Node *);
   void _remove_root();
   void _clear(Node *);
-  int _uniq(Node *, int);
   void get_uniq(Node *, std::vector<int> *);
+  void get_most_frequent(Node *, int, std::vector<int> *);
+  int count_frequency(Node *);
 
 public:
   BST();
@@ -25,7 +26,8 @@ public:
   void remove(int);
   void clear();
   void generate(int, int, int);
-  std::vector<int> uniq(int *);
+  std::vector<int> uniq();
+  std::vector<int> most_frequent();
 };
 
 #endif

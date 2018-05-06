@@ -141,20 +141,6 @@ void BST::_clear(Node *node) {
   delete node;
 }
 
-int BST::_uniq(Node *node, int count = 0) {
-  if (!node) return count;
-
-  bool equal_after = !!_find(node->left, node->value);
-  bool equal_before = find(node->value) != node;
-
-  if (!equal_after && !equal_before) ++count;
-
-  int left = _uniq(node->left);
-  int right = _uniq(node->right);
-
-  return count + left + right;
-};
-
 void BST::get_uniq(Node *node, vector<int> *uniq_values) {
   if (!node) return;
 
@@ -165,6 +151,50 @@ void BST::get_uniq(Node *node, vector<int> *uniq_values) {
 
   get_uniq(node->left, uniq_values);
   get_uniq(node->right, uniq_values);
+}
+
+int BST::count_frequency(Node *node) {
+  Node *temp = node;
+  int count = 0;
+
+  while (temp) {
+    temp = _find(temp->left, temp->value);
+    ++count;
+  }
+
+  return count;
+}
+
+void BST::get_most_frequent(
+  Node *node,
+  int most_frequent_value,
+  vector<int> *most_frequent
+) {
+  if (!node) return;
+
+  bool uniq_value = find(node->value) == node;
+  int self_frequency;
+
+  if (uniq_value) {
+    self_frequency = count_frequency(node);
+    if (self_frequency > most_frequent_value) {
+      most_frequent_value = self_frequency;
+      most_frequent->clear();
+      most_frequent->push_back(node->value);
+    } else if (self_frequency == most_frequent_value) {
+      most_frequent->push_back(node->value);
+    }
+  }
+
+  if (node->left) get_most_frequent(
+    node->left, most_frequent_value, most_frequent
+  );
+
+  if (node->right) get_most_frequent(
+    node->right, most_frequent_value, most_frequent
+  );
+
+
 }
 
 Node *BST::find(int value) {
@@ -182,15 +212,6 @@ Node *BST::insert(int value) {
 
 void BST::print() {
   _print(root);
-}
-
-vector<int> BST::uniq(int *count) {
-  *count = _uniq(root);
-
-  vector<int> uniq_values;
-  get_uniq(root, &uniq_values);
-
-  return uniq_values;
 }
 
 void BST::remove(int value) {
@@ -212,4 +233,19 @@ void BST::generate(int count, int start, int end) {
     int random_number = rand() % range + start;
     insert(random_number);
   }
+}
+
+vector<int> BST::uniq() {
+  vector<int> uniq_values;
+  get_uniq(root, &uniq_values);
+
+  return uniq_values;
+}
+
+vector<int> BST::most_frequent() {
+  vector<int> most_frequent;
+
+  get_most_frequent(root, 0, &most_frequent);
+
+  return most_frequent;
 }
