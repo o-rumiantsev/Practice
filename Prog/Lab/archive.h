@@ -26,8 +26,6 @@ void compress_file(char *filename, char *output_filename) {
   std::filebuf *buf = input.rdbuf();
 
   int terminal_bell = 7;
-  output.write(reinterpret_cast<const char*>(&terminal_bell), sizeof(char));
-  output.write(reinterpret_cast<const char*>(&terminal_bell), sizeof(char));
   output << filename;
   output.write(reinterpret_cast<const char*>(&terminal_bell), sizeof(char));
   output.write(reinterpret_cast<const char*>(&terminal_bell), sizeof(char));
@@ -91,94 +89,54 @@ void lz78_comp(
 // Decompression
 //
 
-void separate_decomp(
-  std::ifstream *,
-  std::filebuf *
-);
-
 void lz78_decomp(
   std::ifstream *,
   std::ofstream *,
   std::filebuf *,
-  int,
   int
+);
+
+std::string read_filename(
+  std::ifstream *,
+  std::filebuf *,
+  int *
 );
 
 void decompress_file(char *filename) {
   std::ifstream input (filename, std::ifstream::binary);
   std::filebuf *buf = input.rdbuf();
 
-  separate_decomp(&input, buf);
+  // separate_decomp(&input, buf);
+  int pos;
+  std::string output_filename = read_filename(&input, buf, &pos);
+
+  std::ofstream output (output_filename, std::ios::app);
+  lz78_decomp(&input, &output, buf, ++pos);
 
   input.close();
+  output.close();
 }
 
-void separate_decomp(
+std::string read_filename(
   std::ifstream *input,
-  std::filebuf *buf
+  std::filebuf *buf,
+  int *pos
 ) {
-  int size = buf->pubseekoff(0, input->end, input->in);
-  buf->pubseekpos(0, input->in);
+  std::string filename;
+  int prev_byte;
+  int byte = buf->sgetc();
+  *pos = 0;
 
-  int prev_byte = buf->sgetc();
-  int reading_filename = 0;
-  int reading_buffer = 0;
-  int compressed_size = 0;
-  int offset = 0;
-  std::string output_filename;
-
-  for (int i = 1; i < size; ++i) {
-    buf->pubseekpos(i, input->in);
-    int byte = buf->sgetc();
-
-    if (byte == 7 && prev_byte == 7) {
-      prev_byte = byte;
-      std::cout << "bell" << std::endl;
-      if (reading_filename) {
-        offset = i + 1;
-        reading_filename = 0;
-        reading_buffer = 1;
-        std::cout << "Reading buffer..." << std::endl;
-      } else if (reading_buffer) {
-        std::string filename = output_filename.substr(
-        0, output_filename.length() - 1
-        );
-        std::ofstream output (filename, std::ios::app);
-        lz78_decomp(input, &output, buf, compressed_size - 1, offset);
-        output.close();
-        reading_filename = 1;
-        reading_buffer = 0;
-        compressed_size = 0;
-        std::cout << "Stop reading buffer..." << std::endl;
-        std::cout << "Reading next filename..." << std::endl;
-        output_filename.clear();
-      } else {
-        std::cout << "Reading filename..." << std::endl;
-        reading_filename = 1;
-        reading_buffer = 0;
-      }
-      continue;
-    }
-
-    if (reading_filename) {
-      prev_byte = byte;
-
-      output_filename.push_back(byte);
-      continue;
-    }
-
-    if (reading_buffer) ++compressed_size;
-
+  while (!(byte == 7 && prev_byte == 7)) {
+    filename.push_back(byte);
     prev_byte = byte;
+    buf->pubseekpos(++(*pos), input->in);
+    byte = buf->sgetc();
   }
 
-  std::string filename = output_filename.substr(
-    0, output_filename.length() - 1
+  return filename.substr(
+    0, filename.length() - 1
   );
-  std::cout << output_filename << " " << compressed_size << std::endl;
-  std::ofstream output (filename, std::ios::app);
-  lz78_decomp(input, &output, buf, compressed_size - 1, offset);
-  output.close();
 }
 
 int bytes_to_int(char *array_of_chars, int size) {
@@ -206,15 +164,15 @@ void lz78_decomp(
   std::ifstream *input,
   std::ofstream *output,
   std::filebuf *buf,
-  int size,
   int offset
 ) {
+  int size = buf->pubseekoff(0, input->end, input->in);
   int code = 1;
   int byte_mask = 1;
   std::map<int, std::string> phrases;
   std::string phrase;
 
-  for (int i = offset; i < offset + size; i += byte_mask + 1) {
+  for (int i = offset; i < size; i += byte_mask + 1) {
     buf->pubseekpos(i, input->in);
 
     if (filled_byte(phrases.size(), byte_mask)) {

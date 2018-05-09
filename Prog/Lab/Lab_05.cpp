@@ -13,10 +13,7 @@ int main(int argc, char **argv) {
     cout << "compressing..." << endl;
     char *output = argv[2];
     remove(output);
-    int i;
-    for (i = 3; i < argc; ++i) {
-      compress_file(argv[i], output);
-    }
+    compress_file(argv[3], output);
   } else if (mode == decompress_mode) {
     cout << "decompressing..." << endl;
     decompress_file(argv[2]);
