@@ -8,6 +8,14 @@
 
 #define filled_byte(bits, mask) (log2(bits) / (mask * 8) == 1 && bits != 1)
 
+void rle(
+  std::ifstream *,
+  std::ofstream *,
+  std::filebuf *,
+  int *,
+  int *
+);
+
 void lz78_comp(
   std::ifstream *,
   std::ofstream *,
@@ -19,7 +27,7 @@ void lz78_comp(
 // Compression
 //
 //
-void compress_file(char *filename, char *output_filename) {
+void compress_file(char *filename, char *output_filename, char *type) {
   std::ifstream input (filename, std::ifstream::binary);
   std::ofstream output (output_filename, std::ios::app);
 
@@ -32,8 +40,14 @@ void compress_file(char *filename, char *output_filename) {
 
   int input_size = 0;
   int output_size = 0;
+  std::string lz_algorithm ("lz");
+  std::string rle_algorithm ("rle");
 
-  lz78_comp(&input, &output, buf, &input_size, &output_size);
+  if (type == lz_algorithm) {
+    lz78_comp(&input, &output, buf, &input_size, &output_size);
+  } else if (type == rle_algorithm){
+    rle(&input, &output, buf, &input_size, &output_size);
+  }
 
   int diff = input_size - output_size;
   float coef = float(float(diff) / float(input_size));
@@ -45,6 +59,41 @@ void compress_file(char *filename, char *output_filename) {
   output.close();
 }
 
+void rle(
+  std::ifstream *input,
+  std::ofstream *output,
+  std::filebuf *buf,
+  int *input_size,
+  int *output_size
+) {
+  int size = buf->pubseekoff(0, input->end, input->in);
+  buf->pubseekpos(0, input->in);
+
+  *input_size = size;
+  int bytes_count = 1;
+
+  for (int i = 0; i < size - 1; ++i) {
+    char byte = buf->sgetc();
+
+    buf->pubseekpos(i + 1, input->in);
+    char next_byte = buf->sgetc();
+
+    if (byte == next_byte && bytes_count != 255) {
+      ++bytes_count;
+      continue;
+    }
+
+    if (bytes_count > 1) {
+      output->write(reinterpret_cast<const char *>(&bytes_count), sizeof(char));
+      *output_size += 1;
+    }
+
+    *output << byte;
+    *output_size += 1;
+
+    bytes_count = 1;
+  }
+}
 
 void lz78_comp(
   std::ifstream *input,
@@ -78,6 +127,12 @@ void lz78_comp(
       output->write(reinterpret_cast<const char *>(&it->second), byte_mask);
       *output << byte;
       *output_size += sizeof(char) + byte_mask;
+
+      if (code == 65535) {
+        phrases.clear();
+        byte_mask = 1;
+        code = 1;
+      }
 
       phrases.insert(std::pair<std::string, int>(phrase, code++));
       phrase.clear();
