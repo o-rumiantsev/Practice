@@ -12,12 +12,16 @@ fn gen_graph() -> Graph::Graph {
     graph.add(vec![vec![3, 2], vec![1, 6], vec![5, 3]]);             // Vertex 4
     graph.add(vec![vec![0, 2], vec![1, 4], vec![4, 3]]);             // Vertex 5
 
-    graph.find_max_tree();
-
     return graph;
 }
 
 fn main() {
     let graph = gen_graph();
-    println!("{:?}", graph);
+    graph.print();
+    println!();
+
+    graph.find_max_tree();
+    println!();
+
+    graph.find_min_tree();
 }
