@@ -77,9 +77,10 @@ impl Graph {
         }
     }
 
-    fn get_max_for_indexes(&self, vertexs_indexes: &Vec<usize>) -> (usize, u32) {
+    fn get_max_for_indexes(&self, vertexs_indexes: &Vec<usize>) -> (usize, u32, usize) {
         let mut index: usize = 0;
         let mut weight: u32 = 0;
+        let mut cur_index: usize = 0;
 
         for i in vertexs_indexes {
             let (k, vertex) = get_max_weight_edge(&self.vertexs[*i], vertexs_indexes);
@@ -87,16 +88,18 @@ impl Graph {
             if !vertexs_indexes.contains(&idx) && vertex[1] > weight {
                 weight = vertex[1];
                 index = k;
+                cur_index = *i;
             }
         }
 
 
-        return (index, weight);
+        return (index, weight, cur_index);
     }
 
-    fn get_min_for_indexes(&self, vertexs_indexes: &Vec<usize>) -> (usize, u32) {
+    fn get_min_for_indexes(&self, vertexs_indexes: &Vec<usize>) -> (usize, u32, usize) {
         let mut index: usize = 0;
         let mut weight: u32 = <u32>::max_value();
+        let mut cur_index: usize = 0;
 
         for i in vertexs_indexes {
             let (k, vertex) = get_min_weight_edge(&self.vertexs[*i], vertexs_indexes);
@@ -104,20 +107,20 @@ impl Graph {
             if !vertexs_indexes.contains(&idx) && vertex[1] < weight {
                 weight = vertex[1];
                 index = k;
+                cur_index = *i;
             }
         }
 
 
-        return (index, weight);
+        return (index, weight, cur_index);
     }
 
 
     pub fn find_max_tree(&self) {
-        let mut cur_index: usize = 0;
         let mut total_weight: u32 = 0;
         let mut vertexs_indexes: Vec<usize> = vec![0];
 
-        let (mut index, mut weight) = self.get_max_for_indexes(&vertexs_indexes);
+        let (mut index, mut weight, mut cur_index) = self.get_max_for_indexes(&vertexs_indexes);
         total_weight += weight;
 
         println!(
@@ -130,6 +133,7 @@ impl Graph {
             let res = self.get_max_for_indexes(&vertexs_indexes);
             index = res.0;
             weight = res.1;
+            cur_index = res.2;
 
             if index != 0 {
                 total_weight += weight;
@@ -138,8 +142,6 @@ impl Graph {
                     cur_index, weight, index, total_weight
                 );
             }
-
-            cur_index = index;
         }
 
         println!("Total {}",total_weight);
@@ -150,7 +152,7 @@ impl Graph {
         let mut total_weight: u32 = 0;
         let mut vertexs_indexes: Vec<usize> = vec![0];
 
-        let (mut index, mut weight) = self.get_min_for_indexes(&vertexs_indexes);
+        let (mut index, mut weight, mut cur_index) = self.get_min_for_indexes(&vertexs_indexes);
         total_weight += weight;
 
         println!(
@@ -163,6 +165,7 @@ impl Graph {
             let res = self.get_min_for_indexes(&vertexs_indexes);
             index = res.0;
             weight = res.1;
+            cur_index = res.2;
 
             if index != 0 {
                 total_weight += weight;
@@ -171,8 +174,6 @@ impl Graph {
                     cur_index, weight, index, total_weight
                 );
             }
-
-            cur_index = index;
         }
 
         println!("Total {}",total_weight);

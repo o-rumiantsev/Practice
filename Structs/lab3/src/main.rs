@@ -5,12 +5,14 @@ use lab3::Graph;
 fn gen_graph() -> Graph::Graph {
     let mut graph = Graph::new();
 
-    graph.add(vec![vec![1, 1], vec![5, 2]]);                         // Vertex 0
-    graph.add(vec![vec![0, 1], vec![2, 5], vec![5, 4], vec![4, 6]]); // Vertex 1
-    graph.add(vec![vec![1, 5]]);                                     // Vertex 2
-    graph.add(vec![vec![4, 2]]);                                     // Vertex 3
-    graph.add(vec![vec![3, 2], vec![1, 6], vec![5, 3]]);             // Vertex 4
-    graph.add(vec![vec![0, 2], vec![1, 4], vec![4, 3]]);             // Vertex 5
+    graph.add(vec![vec![1, 2], vec![3, 1]]);                                                 // V0
+    graph.add(vec![vec![0, 2], vec![2, 4], vec![3, 3], vec![4, 8]]);                         // V1
+    graph.add(vec![vec![1, 4], vec![4, 7]]);                                                 // V2
+    graph.add(vec![vec![0, 1], vec![1, 3], vec![4, 5]]);                                     // V3
+    graph.add(vec![vec![3, 5], vec![2, 7], vec![1, 8], vec![5, 3], vec![6, 1], vec![7, 2]]); // V4
+    graph.add(vec![vec![4, 3]]);                                                             // V5
+    graph.add(vec![vec![4, 1], vec![7, 8]]);                                                 // V6
+    graph.add(vec![vec![6, 8], vec![4, 2]]);                                                 // V7
 
     return graph;
 }
